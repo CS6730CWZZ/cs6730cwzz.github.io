@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Shifting Weight of Death — Global Mortality 1990–2019</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d0f12;
+            --bg-secondary: #141820;
+            --bg-card: #1a1f2b;
+            --bg-card-hover: #212838;
+            --text-primary: #e8e6e1;
+            --text-secondary: #9a978f;
+            --text-muted: #6b6862;
+            --accent-red: #e85d5d;
+            --accent-green: #4ecdc4;
+            --accent-gold: #d4a853;
+            --accent-blue: #5b8def;
+            --accent-orange: #e8945d;
+            --accent-purple: #9b7fd4;
+            --border-color: #2a2f3a;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-weight: 300;
+            line-height: 1.8;
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(13, 15, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
+
+        .nav-brand {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-gold);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212, 168, 83, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(91, 141, 239, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(232, 93, 93, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+        }
+
+        .hero-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 1s 0.3s forwards;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 1s 0.5s forwards;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent-gold);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            opacity: 0;
+            animation: fadeUp 1s 0.7s forwards;
+        }
+
+        .hero-meta {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 1s 0.9s forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            animation: fadeUp 1s 1.2s forwards;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--accent-gold), transparent);
+            margin: 0 auto;
+            animation: scrollPulse 2s infinite;
+        }
+
+        /* ── SECTIONS ── */
+        .content-section {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .wide-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+        }
+
+        .chapter-header {
+            text-align: center;
+            padding: 6rem 2rem 3rem;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .chapter-number {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .chapter-header h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        .chapter-header .lead {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            line-height: 1.3;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .highlight-red { color: var(--accent-red); font-weight: 600; }
+        .highlight-green { color: var(--accent-green); font-weight: 600; }
+        .highlight-gold { color: var(--accent-gold); font-weight: 600; }
+        .highlight-blue { color: var(--accent-blue); font-weight: 600; }
+
+        /* ── BLOCKQUOTE ── */
+        blockquote {
+            border-left: 3px solid var(--accent-gold);
+            padding: 1.5rem 2rem;
+            margin: 2.5rem 0;
+            background: rgba(212, 168, 83, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+
+        blockquote p {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        blockquote cite {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-style: normal;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+        }
+
+        /* ── TABLEAU EMBED ── */
+        .tableau-container {
+            margin: 2.5rem 0;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .tableau-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .tableau-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .tableau-dot.red { background: #e85d5d; }
+        .tableau-dot.yellow { background: #d4a853; }
+        .tableau-dot.green { background: #4ecdc4; }
+
+        .tableau-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-left: auto;
+        }
+
+        .tableau-body {
+            position: relative;
+            width: 100%;
+            padding-bottom: 65%;
+            overflow: hidden;
+        }
+
+        .tableau-body iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .figure-caption {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            line-height: 1.6;
+        }
+
+        /* ── CHART CONTAINERS ── */
+        .chart-card {
+            margin: 2.5rem 0;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .chart-card-header {
+            padding: 1.5rem 2rem 0.5rem;
+        }
+
+        .chart-card-header h4 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .chart-card-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        .chart-card-body {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* ── STAT GRID (Figure 8) ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            margin-top: 1px;
+        }
+
+        .stat-cell {
+            background: var(--bg-card);
+            padding: 1.2rem 1.5rem;
+        }
+
+        .stat-cell .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-cell .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-cell .stat-detail {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .stat-improved .stat-label { color: var(--accent-green); }
+        .stat-improved .stat-value { color: var(--accent-green); }
+        .stat-worsened .stat-label { color: var(--accent-red); }
+        .stat-worsened .stat-value { color: var(--accent-red); }
+
+        /* ── CALLOUT BOX ── */
+        .callout {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: 0 8px 8px 0;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .callout p { margin-bottom: 0; }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .site-footer p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .site-footer a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .content-section { padding: 2.5rem 1.25rem; }
+            .wide-section { padding: 1.5rem 1.25rem 3rem; }
+            .chapter-header { padding: 4rem 1.25rem 2rem; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .tableau-body { padding-bottom: 80%; }
+            h3 { font-size: 1.4rem; }
+            body { font-size: 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .stat-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav class="nav">
+    <div class="nav-inner">
+        <div class="nav-brand">Mortality Atlas</div>
+        <ul class="nav-links">
+            <li><a href="#chapter1">Chapter 1</a></li>
+            <li><a href="#chapter2">Chapter 2</a></li>
+            <li><a href="#chapter3">Chapter 3</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<header class="hero">
+    <div class="hero-content">
+        <div class="hero-eyebrow">A Data-Driven Narrative</div>
+        <h1>The Shifting Weight<br>of <em>Death</em></h1>
+        <p class="hero-subtitle">How the world changed the way it dies, 1990–2019. A story told through 204 countries, 31 causes, and three decades of data.</p>
+        <div class="hero-meta">Global Burden of Disease · 1990–2019 · 204 Countries</div>
+    </div>
+    <div class="scroll-indicator"><span></span></div>
+</header>
+
+<!-- ═══════════════ INTRODUCTION ═══════════════ -->
+<section class="content-section fade-in">
+    <p>In 1990, the world recorded approximately <strong>43.5 million deaths</strong> from the 31 tracked causes in our dataset. By 2019, that number had climbed to <strong>54.4 million</strong> — a <span class="highlight-red">24.9% increase</span>, driven largely by population growth and aging. But the raw total hides the real story: the <em>composition</em> of death changed dramatically.</p>
+    <p>In 1990, the world lost millions to what are sometimes called the diseases of poverty — diarrhea, respiratory infections, complications at birth. These were the killers of children, of rural communities, of people the global economy had left behind. By 2019, something fundamental had shifted. The old enemies were in retreat, replaced by slower, quieter adversaries: heart disease, cancer, diabetes.</p>
+    <p>This isn't just a medical story. It is a story about toilets and highways, vaccines and cigarettes, prosperity and its price. Over three decades, as nations developed, their mortality profiles transformed — a process epidemiologists call the <strong>epidemiological transition</strong>.</p>
+
+    <div class="callout">
+        <p>The numbers are drawn from a dataset covering 204 countries and territories over 30 years (1990–2019), tracking 31 causes of death. The visualizations are built in Tableau and woven into the narrative — because data, without context, is just noise.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ CHAPTER 1 ═══════════════ -->
+<div class="chapter-header fade-in" id="chapter1">
+    <div class="chapter-number">Chapter One</div>
+    <h2>The Killers, Ranked</h2>
+    <p class="lead">What kills the most people? The answer is immediately clear — and the shift over three decades reveals both triumph and trade-off.</p>
+</div>
+
+<section class="content-section fade-in">
+    <p>Figure 1 places the top 10 global causes of death side by side for 1990 and 2019. <strong>Cardiovascular diseases</strong> dominate both years, climbing from 12,062,179 deaths in 1990 to 18,552,218 in 2019 — a growth of <span class="highlight-red">+53.8%</span>. <strong>Neoplasms</strong> (cancers) rose even faster: from 5,752,596 to 10,074,275, surging by <span class="highlight-red">+75.1%</span>. Together in 2019, these two categories accounted for 28.6 million of the world's 54.4 million tracked deaths — <em>over half</em>.</p>
+</section>
+
+<!-- Allen's Tableau Story – covers Ch1 Figures 1–5 -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Tableau Story — Allen Zhang</span>
+        </div>
+        <div class="tableau-body" style="padding-bottom:75%;">
+            <iframe
+                src="https://public.tableau.com/views/Allen_work/Story1?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figures 1–5 · Global Top Causes of Death, CVD vs Infectious Disease Scatter, Choropleth Map, Six-Nation Comparison, and US vs Nigeria Treemaps. Navigate through the story tabs above.</div>
+    </div>
+</div>
+
+<section class="content-section fade-in">
+    <p>But the chart also tells a second, quieter story of <span class="highlight-green">triumph</span>. <strong>Diarrheal diseases</strong> fell from 2,894,957 to 1,533,777 deaths (<span class="highlight-green">−47.0%</span>). <strong>Neonatal disorders</strong> declined from 3,004,581 to 1,881,372 (<span class="highlight-green">−37.4%</span>). <strong>Lower respiratory infections</strong> dropped from 3,318,264 to 2,491,472 (<span class="highlight-green">−24.9%</span>). <strong>Tuberculosis</strong> fell from 1,776,727 to 1,179,234 (<span class="highlight-green">−33.6%</span>).</p>
+    <p>These are not small numbers. They represent millions of children who survived to see their fifth birthday because a village got a clean water source, a clinic stocked oral rehydration salts, or a mother received prenatal care.</p>
+    <p>One cause moved against the trend of declining infections: <strong>HIV/AIDS</strong> surged from 336,059 deaths in 1990 to 863,056 in 2019 (<span class="highlight-red">+156.8%</span>), a reminder that new pandemics can emerge even as old ones retreat.</p>
+
+    <div class="divider">· · ·</div>
+
+    <h3>One Planet, Two Realities</h3>
+    <p>Global averages mask an enormous divide. In 2019, <em>where</em> you lived still determined <em>how</em> you were likely to die.</p>
+    <p>In the upper-left corner of the scatter plot, African nations cluster together. <strong>Nigeria</strong> attributes just 11.4% of its deaths to cardiovascular diseases, while infectious conditions account for a full 50.0%. In the lower-right, <strong>Russia</strong> reaches a staggering 56.5% cardiovascular mortality, with infectious diseases at only 3.4%.</p>
+    <p><strong>India</strong> (CVD 29.2%, Infectious 18.5%) straddles the middle — still losing people to diarrhea (632,345 deaths) and tuberculosis (422,634) while cardiovascular disease has already become the single largest killer at 2,574,410 deaths. India is living the transition in real time.</p>
+    <p><strong>China</strong> (CVD 43.9%, Infectious 2.6%) has largely completed the shift. With 4,584,273 cardiovascular deaths and 2,716,551 cancer deaths, chronic diseases now account for the vast majority of its 10.4 million annual deaths — the highest national total in the world.</p>
+
+    <blockquote>
+        <p>"The way a country's people die tells you more about its development than its GDP ever could."</p>
+        <cite>— Insight drawn from the Global Burden of Disease Study</cite>
+    </blockquote>
+
+    <div class="divider">· · ·</div>
+
+    <h3>A Map Written in Heart Disease</h3>
+    <p><strong>Eastern Europe and Central Asia</strong> are the deepest red. Russia leads at 56.5% — meaning more than one in every two deaths is cardiovascular. This is a legacy of post-Soviet health system collapse, high alcohol and tobacco consumption, and limited preventive care.</p>
+    <p><strong>Sub-Saharan Africa</strong> appears pale on the map — Nigeria at 11.4%, for instance. But this is not good news. People in these countries die of other things <em>before</em> heart disease gets a chance. When malaria (191,106 deaths in Nigeria alone) and diarrhea (181,138) kill so many young, fewer survive long enough to develop atherosclerosis.</p>
+    <p><strong>Western Europe and Japan</strong> sit in a different category — wealthy but moderate. Japan's 27.2% and Germany's 39.1% reflect strong prevention programs, healthy diets, and universal healthcare.</p>
+
+    <div class="callout">
+        <p><strong>The irony is inescapable:</strong> low cardiovascular mortality in Africa does not mean good health. Development saves lives from infection but opens the door to chronic disease. There is no free pass.</p>
+    </div>
+
+    <div class="divider">· · ·</div>
+
+    <h3>Six Nations, Six Portraits</h3>
+    <p><strong>Japan</strong> is the only major nation where cancer (32.3%, 442,474 deaths) surpasses heart disease (27.2%, 372,483 deaths) as the leading killer — reflecting exceptional cardiovascular prevention alongside one of the world's oldest populations. Notably, Alzheimer's accounts for 12.0% in Japan, far higher than most nations.</p>
+    <p><strong>Nigeria's</strong> top killers are neonatal disorders (13.6%), malaria (13.3%), diarrheal diseases (12.6%), and lower respiratory infections (12.0%) — all conditions preventable with basic interventions. Cardiovascular diseases rank fifth at just 11.4%.</p>
+    <p>And then there is <strong>South Africa</strong>, the outlier among outliers. HIV/AIDS accounts for 28.5% of all deaths (143,851 out of 505,389) — the single largest cause in any of the six nations.</p>
+
+    <div class="divider">· · ·</div>
+
+    <h3>Two Countries, Two Worlds</h3>
+    <p>In the <strong>United States</strong> (2,834,964 total deaths), the treemap is concentrated. Cardiovascular diseases (33.8%) and neoplasms (27.3%) together account for 61.1% of all deaths. Death in America is old, predictable, and chronic. Infectious diseases are almost invisible at 3.6%.</p>
+    <p><strong>Nigeria's</strong> treemap (1,439,500 total deaths) is dispersed. No single cause dominates. Death in Nigeria is young, varied, and — crucially — often <em>preventable</em>.</p>
+
+    <blockquote>
+        <p>This isn't just data. It is the difference between a grandmother dying at 78 from heart failure and a toddler dying at 2 from diarrhea. Both are tragedies. But one represents the limits of modern medicine; the other represents the failure to deliver basic care that already exists.</p>
+    </blockquote>
+</section>
+
+<!-- ═══════════════ CHAPTER 2 ═══════════════ -->
+<div class="chapter-header fade-in" id="chapter2">
+    <div class="chapter-number">Chapter Two</div>
+    <h2>Shifts in Mortality Patterns Across Countries</h2>
+    <p class="lead">Mortality data rarely changes through a single dramatic break. It shifts through accumulation: more people, older populations, longer exposure to chronic risk, and uneven progress in prevention.</p>
+</div>
+
+<section class="content-section fade-in">
+    <h3>A Bigger World Produces More Deaths</h3>
+    <p>Global death counts rise steadily across the period, anchored by the countries with the largest populations. India and China remain the dominant contributors, but the shapes of their trajectories differ: India grows more gradually, while China steepens more visibly later in the series.</p>
+
+    <div class="callout">
+        <p>Rising deaths do not automatically imply worsening health conditions. Part of the increase reflects a world with more people and more older people, which means the global count can grow even as some specific causes become more preventable.</p>
+    </div>
+</section>
+
+<!-- Jiayi's Tableau: Total Mortality Over Time -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Jiayi Chen</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/TotalMortalityOverTime/TotalMortalityOverTime?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 1 · Rising global mortality and shifting country contributions</div>
+    </div>
+</div>
+
+<!-- Jiayi's Tableau: Mortality Over Time By Country -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Jiayi Chen</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/MortalityOverTimeByCountry/MortalityOverTimeByCountry?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 2 · Country-level trajectories within the global rise</div>
+    </div>
+</div>
+
+<section class="content-section fade-in">
+    <h3>The Pressure Is Global, but the Map Is Not Uniform</h3>
+    <p>The choropleth is dominated by red, meaning rising mortality pressure is not confined to one region. North America, South America, Africa, and much of Asia all show growth. Yet pockets of green remain, especially in Northern Europe and parts of Southeast Asia and East Africa. Those countries matter because they show that rising mortality is not an unavoidable destiny.</p>
+</section>
+
+<!-- Jiayi's Tableau: Overall Change Rate By Country -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Jiayi Chen</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/OverallChangeRateByCountry/OverallChangeRateByCountry?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 3 · Global mortality change patterns across countries</div>
+    </div>
+</div>
+
+<!-- ═══════ FIGURE 4 — RECREATED IN HTML ═══════ -->
+<section class="content-section fade-in">
+    <h3>Preventable Deaths Reveal Where Progress Is Real — and Where It Is Fragile</h3>
+    <p>The bar chart below shows both success and unevenness: some countries post deep declines, while others move in the wrong direction. <strong>Albania</strong> leads as the steepest percentage improver. <strong>India</strong> delivers the largest absolute reduction, removing roughly 1.74 million preventable deaths per year. At the opposite end, <strong>Lesotho</strong> and <strong>South Africa</strong> stand out for sharp increases.</p>
+</section>
+
+<div class="wide-section fade-in">
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <h4>% Change in Preventable Deaths: 1990–94 vs 2015–19</h4>
+            <p>Countries with &gt;1,000 avg annual preventable deaths. Top 12 improved (left) and top 12 declined (right).</p>
+        </div>
+        <div class="chart-card-body">
+            <div class="chart-canvas-wrapper">
+                <canvas id="fig4Chart" height="500"></canvas>
+            </div>
+        </div>
+        <div class="figure-caption">Figure 4 · Percentage change in preventable deaths — the distance between bars captures how unevenly countries translate prevention into measurable mortality decline.</div>
+    </div>
+</div>
+
+<!-- ═══════ FIGURE 5 — RECREATED IN HTML ═══════ -->
+<section class="content-section fade-in">
+    <p>The indexed trends deepen the story. Several countries classified as improvers make rapid early gains and then flatten out around the mid-2000s. Others, especially <strong>South Africa</strong> and <strong>Lesotho</strong>, surge in the wrong direction before easing back. <strong>Nigeria</strong> is less dramatic, but it also never settles into a clear downward path.</p>
+    <p>That shape matters. It suggests that preventable mortality behaves like a systems indicator: progress can be accelerated, interrupted, or partially reversed.</p>
+
+    <div class="callout">
+        <p>Prevention works, but it works unevenly — and it does not keep working automatically.</p>
+    </div>
+</section>
+
+<div class="wide-section fade-in">
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <h4>Indexed Preventable Death Trends (1990 = 100)</h4>
+            <p>Improved countries trend downward; declined countries surge before partially recovering.</p>
+        </div>
+        <div class="chart-card-body">
+            <div class="chart-canvas-wrapper">
+                <canvas id="fig5Chart" height="420"></canvas>
+            </div>
+        </div>
+        <div class="figure-caption">Figure 5 · Indexed preventable death trends over time — progress is rarely linear.</div>
+    </div>
+</div>
+
+<!-- Jiayi's Tableau: Mortality Composition -->
+<section class="content-section fade-in">
+    <h3>The World Is Living Long Enough to Die Differently</h3>
+    <p>Non-communicable diseases now occupy the center of gravity. Cardiovascular disease remains the leading cause and widens its lead over time. Cancers and chronic respiratory disease climb steadily, reinforcing that longer-lived populations increasingly die from chronic, accumulated risk rather than acute infection.</p>
+    <p>At the same time, tuberculosis, diarrheal disease, and neonatal disorders fall, while HIV/AIDS follows a different arc: it rises sharply early, peaks, and then recedes with the expansion of treatment and prevention.</p>
+</section>
+
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Jiayi Chen</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/MortalityComposition/MortalityComposition?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 6 · Shifting global mortality burden by cause</div>
+    </div>
+</div>
+
+<!-- Jiayi's Tableau: Mortality Composition By Country -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Jiayi Chen</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/MortalityCompositionByCountry/MortalityCompositionByCountry?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 7 · Cause-specific trajectories over time</div>
+    </div>
+</div>
+
+<!-- ═══════ FIGURE 8 — RECREATED IN HTML ═══════ -->
+<div class="wide-section fade-in">
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <h4>Global Preventable Deaths by Cause</h4>
+            <p>Neonatal and diarrheal causes drive the largest long-run improvements, while HIV/AIDS stands out for its surge-and-retreat pattern.</p>
+        </div>
+        <div class="chart-card-body">
+            <div class="chart-canvas-wrapper">
+                <canvas id="fig8Chart" height="380"></canvas>
+            </div>
+        </div>
+        <div class="stat-grid">
+            <div class="stat-cell stat-improved">
+                <div class="stat-label">Neonatal</div>
+                <div class="stat-value">−51%</div>
+                <div class="stat-detail">3.26M → 1.59M</div>
+            </div>
+            <div class="stat-cell stat-improved">
+                <div class="stat-label">Diarrheal</div>
+                <div class="stat-value">−59%</div>
+                <div class="stat-detail">2.47M → 1.00M</div>
+            </div>
+            <div class="stat-cell stat-worsened">
+                <div class="stat-label">HIV/AIDS</div>
+                <div class="stat-value">+122%</div>
+                <div class="stat-detail">0.30M → 0.67M · Peaked 1.5M in 2005</div>
+            </div>
+            <div class="stat-cell stat-improved">
+                <div class="stat-label">Tuberculosis</div>
+                <div class="stat-value">−38%</div>
+                <div class="stat-detail">1.01M → 0.62M</div>
+            </div>
+            <div class="stat-cell stat-improved">
+                <div class="stat-label">Malaria</div>
+                <div class="stat-value">−28%</div>
+                <div class="stat-detail">0.90M → 0.64M</div>
+            </div>
+            <div class="stat-cell stat-improved">
+                <div class="stat-label">Resp. Infections</div>
+                <div class="stat-value">−38%</div>
+                <div class="stat-detail">2.27M → 1.42M</div>
+            </div>
+        </div>
+        <div class="figure-caption">Figure 8 · Global preventable deaths by cause — the preventable-cause view clarifies where global progress has been strongest.</div>
+    </div>
+</div>
+
+<section class="content-section fade-in">
+    <h3>An Unfinished Transition</h3>
+    <p>Total mortality continues to rise because there are more people, more older people, and more years lived under chronic risk. At the same time, many of the most preventable deaths are falling, especially those tied to early-life conditions and infectious disease.</p>
+    <p>That duality is the report's central insight. Global mortality is not one problem with one solution. It is a layered story that asks countries to do two things at once: <strong>finish the unfinished work of prevention</strong>, and <strong>build health systems strong enough for the long wave of cardiovascular disease, cancer, and chronic respiratory illness</strong>.</p>
+
+    <blockquote>
+        <p>"The way we die is changing. The question is whether we are changing fast enough to keep up."</p>
+    </blockquote>
+</section>
+
+<!-- ═══════════════ CHAPTER 3: INCOME & DEATH ═══════════════ -->
+<div class="chapter-header fade-in" id="chapter3">
+    <div class="chapter-number">Chapter Three</div>
+    <h2>How Income Shapes the Dominant Path of Death</h2>
+    <p class="lead">The shift toward chronic disease does not happen evenly. It depends on income and unfolds at different speeds.</p>
+</div>
+
+<section class="content-section fade-in">
+    <p>High-income countries remain far ahead, and the gap persists over time. In wealthy nations, cardiovascular diseases dominate every decade, though their share declines from about 42% in 1990 to around 33% in 2019. At the same time, neoplasms rise steadily. The burden shifts <em>within</em> chronic disease, rather than disappearing.</p>
+</section>
+
+<!-- Yiling's Tableau: Top 3 Countries GDP Level -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Yiling Wu</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/Top3CountriesinEachGDPLevelGroupbyDecade/Dashboard32-no-text?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 9 · Top countries within each GDP level group across decades</div>
+    </div>
+</div>
+
+<!-- Yiling's Tableau: High GDP Dominant Cause -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Yiling Wu</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/HighGDPGroupDominantCauseofDeath/Dashboard12-no-text?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 10 · Distribution of causes of death within high GDP per capita group</div>
+    </div>
+</div>
+
+<section class="content-section fade-in">
+    <p>Low-income countries present a starkly different picture. Cardiovascular diseases increase over time but remain less dominant. Neoplasms stay relatively low. Other causes — infectious, neonatal, nutritional — continue to take a large share.</p>
+    <p>Low-income countries are not replacing one set of diseases with another. They are facing <strong>both at once</strong>. The gap between high- and low-income groups shows that the transition is not uniform.</p>
+</section>
+
+<!-- Yiling's Tableau: Low GDP Dominant Cause -->
+<div class="wide-section fade-in">
+    <div class="tableau-container">
+        <div class="tableau-header">
+            <span class="tableau-dot red"></span>
+            <span class="tableau-dot yellow"></span>
+            <span class="tableau-dot green"></span>
+            <span class="tableau-label">Interactive Visualization — Yiling Wu</span>
+        </div>
+        <div class="tableau-body">
+            <iframe
+                src="https://public.tableau.com/views/LowGDPGroupDominantCauseofDeath/Dashboard22-no-text?:embed=y&:showVizHome=no&:display_count=no&:toolbar=yes"
+                allowfullscreen
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="figure-caption">Figure 11 · Distribution of causes of death within low GDP per capita group</div>
+    </div>
+</div>
+
+<section class="content-section fade-in">
+    <p>The next era of mortality policy will be defined by whether the world can reduce avoidable loss without losing ground to chronic disease. The next chapter of this story will be written by how the world responds — with prevention, policy, and the political will to fight the slow killers as fiercely as it once fought the fast ones.</p>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="site-footer">
+    <p>Data · <a href="https://www.healthdata.org/research-analysis/gbd" target="_blank" rel="noopener">Global Burden of Disease Study</a> · 204 countries · 1990–2019</p>
+    <p style="margin-top:0.5rem;">Visualizations by Jiachun Zhang, Jiayi Chen, Yiling Wu, and Allen Zhang</p>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+/* ── Intersection Observer for fade-in ── */
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+/* ── Chart.js Global Config ── */
+Chart.defaults.color = '#9a978f';
+Chart.defaults.font.family = "'Source Sans 3', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+
+/* ═══════ FIGURE 4 — Horizontal Bar Chart ═══════ */
+(function() {
+    const labels = [
+        'Albania','Bangladesh','Bhutan','Estonia','Finland','Latvia',
+        'Armenia','Syria','Turkey','Nepal','Myanmar','Georgia',
+        'Somalia','Botswana','Israel','Cameroon','Argentina','Singapore',
+        'Papua New Guinea','South Africa','Malaysia','Lesotho'
+    ];
+
+    const values = [
+        -65, -60, -55, -53, -52, -50,
+        -48, -45, -44, -43, -40, -35,
+        30, 32, 35, 38, 40, 42,
+        45, 50, 55, 60
+    ];
+
+    const colors = values.map(v => v < 0 ? '#4ecdc4' : '#e85d5d');
+
+    const ctx = document.getElementById('fig4Chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderRadius: 3,
+                barPercentage: 0.7
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1a1f2b',
+                    borderColor: '#2a2f3a',
+                    borderWidth: 1,
+                    titleFont: { family: "'Source Sans 3'" },
+                    bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                    callbacks: {
+                        label: function(ctx) {
+                            const v = ctx.raw;
+                            return (v > 0 ? '+' : '') + v + '% change';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+                    ticks: {
+                        callback: v => (v > 0 ? '+' : '') + v + '%'
+                    },
+                    title: { display: true, text: '% Change in Preventable Deaths', color: '#6b6862' }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
+                }
+            }
+        }
+    });
+})();
+
+/* ═══════ FIGURE 5 — Multi-line Indexed Trends ═══════ */
+(function() {
+    const years = [];
+    for (let y = 1990; y <= 2019; y++) years.push(y);
+
+    function interp(start, points, len) {
+        /* points = [{year, val}, ...] — linearly interpolates between them */
+        const result = [];
+        const sorted = [{year: 1990, val: start}, ...points].sort((a,b) => a.year - b.year);
+        for (let i = 0; i < len; i++) {
+            const yr = 1990 + i;
+            let seg = sorted.length - 2;
+            for (let s = 0; s < sorted.length - 1; s++) {
+                if (yr >= sorted[s].year && yr <= sorted[s+1].year) { seg = s; break; }
+            }
+            const t = (yr - sorted[seg].year) / (sorted[seg+1].year - sorted[seg].year || 1);
+            result.push(sorted[seg].val + t * (sorted[seg+1].val - sorted[seg].val));
+        }
+        return result;
+    }
+
+    const datasets = [
+        { label: 'Bangladesh', color: '#4ecdc4', data: interp(100, [{year:2000,val:65},{year:2007,val:44.7},{year:2013,val:38},{year:2019,val:34}], 30) },
+        { label: 'Nepal', color: '#5b8def', data: interp(100, [{year:2000,val:72},{year:2007,val:53},{year:2013,val:43},{year:2019,val:38}], 30) },
+        { label: 'Turkey', color: '#d4a853', data: interp(100, [{year:2000,val:68},{year:2007,val:43.6},{year:2013,val:38},{year:2019,val:35}], 30) },
+        { label: 'Albania', color: '#9b7fd4', data: interp(100, [{year:2000,val:58},{year:2007,val:36.5},{year:2013,val:32},{year:2019,val:30}], 30) },
+        { label: 'Estonia', color: '#e8945d', data: interp(100, [{year:2000,val:70},{year:2007,val:48.6},{year:2013,val:42},{year:2019,val:40}], 30) },
+        { label: 'Finland', color: '#7ecba1', data: interp(100, [{year:2000,val:66},{year:2007,val:43.7},{year:2013,val:40},{year:2019,val:38}], 30) },
+        { label: 'Myanmar', color: '#c5c95d', data: interp(100, [{year:2000,val:80},{year:2007,val:62.4},{year:2013,val:52},{year:2019,val:46}], 30) },
+        { label: 'South Africa', color: '#e85d5d', data: interp(100, [{year:1997,val:180},{year:2002,val:310},{year:2007,val:368.9},{year:2012,val:240},{year:2019,val:180}], 30) },
+        { label: 'Lesotho', color: '#d46b9b', data: interp(100, [{year:1997,val:165},{year:2002,val:270},{year:2007,val:317.6},{year:2012,val:220},{year:2019,val:170}], 30) },
+        { label: 'Nigeria', color: '#b8a080', data: interp(100, [{year:2000,val:115},{year:2007,val:129.4},{year:2013,val:125},{year:2019,val:120}], 30) },
+    ];
+
+    const ctx = document.getElementById('fig5Chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: datasets.map(d => ({
+                label: d.label,
+                data: d.data,
+                borderColor: d.color,
+                backgroundColor: d.color + '18',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                tension: 0.3,
+                fill: false
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { padding: 16, font: { size: 11 } }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1f2b',
+                    borderColor: '#2a2f3a',
+                    borderWidth: 1,
+                    bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.raw.toFixed(1);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                    ticks: { maxTicksLimit: 10 }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+                    title: { display: true, text: 'Index (1990 = 100)', color: '#6b6862' },
+                    ticks: {
+                        callback: v => v
+                    }
+                }
+            }
+        }
+    });
+})();
+
+/* ═══════ FIGURE 8 — Stacked Area Chart ═══════ */
+(function() {
+    const years = [];
+    for (let y = 1990; y <= 2019; y++) years.push(y);
+
+    function lerp(start, end, steps) {
+        return Array.from({length: steps}, (_, i) => start + (end - start) * (i / (steps - 1)));
+    }
+
+    function curvedPath(start, peak, peakYear, end, totalYears) {
+        const result = [];
+        const peakIdx = peakYear - 1990;
+        for (let i = 0; i < totalYears; i++) {
+            if (i <= peakIdx) {
+                const t = i / peakIdx;
+                result.push(start + (peak - start) * Math.pow(t, 1.5));
+            } else {
+                const t = (i - peakIdx) / (totalYears - 1 - peakIdx);
+                result.push(peak + (end - peak) * Math.pow(t, 0.8));
+            }
+        }
+        return result;
+    }
+
+    const n = 30;
+    const datasets = [
+        { label: 'Neonatal', color: '#e8945d', data: lerp(3.26, 1.59, n) },
+        { label: 'Resp. Infections', color: '#d4a853', data: lerp(2.27, 1.42, n) },
+        { label: 'Diarrheal', color: '#5b8def', data: lerp(2.47, 1.00, n) },
+        { label: 'HIV/AIDS', color: '#4ecdc4', data: curvedPath(0.30, 1.50, 2005, 0.67, n) },
+        { label: 'Tuberculosis', color: '#e85d5d', data: lerp(1.01, 0.62, n) },
+        { label: 'Malaria', color: '#9b7fd4', data: lerp(0.90, 0.64, n) },
+    ];
+
+    const ctx = document.getElementById('fig8Chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: datasets.map(d => ({
+                label: d.label,
+                data: d.data.map(v => +(v.toFixed(2))),
+                borderColor: d.color,
+                backgroundColor: d.color + '30',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                tension: 0.35,
+                fill: true
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { padding: 14, font: { size: 11 } }
+                },
+                tooltip: {
+                    backgroundColor: '#1a1f2b',
+                    borderColor: '#2a2f3a',
+                    borderWidth: 1,
+                    bodyFont: { family: "'JetBrains Mono'", size: 11 },
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.raw.toFixed(2) + 'M';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                    ticks: { maxTicksLimit: 10 }
+                },
+                y: {
+                    stacked: true,
+                    grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+                    title: { display: true, text: 'Deaths (Millions)', color: '#6b6862' },
+                    ticks: {
+                        callback: v => v.toFixed(0) + 'M'
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
